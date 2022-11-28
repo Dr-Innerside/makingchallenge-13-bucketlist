@@ -6,7 +6,9 @@ import os
 app = Flask(__name__)
 
 load_dotenv()
-client = os.environ.get('client')
+URL = os.environ.get('client')
+client = MongoClient(URL)
+db = client.makingchallenge
 
 @app.route('/')
 def show_index():
