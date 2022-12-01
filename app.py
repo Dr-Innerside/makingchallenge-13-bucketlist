@@ -48,6 +48,14 @@ def login():
     
     access_token = create_access_token(identity=username_receive)
     return jsonify({'msg':f'{username_receive}님 환영합니다', 'access_token': access_token}), 200
+
+@app.route('/bucket/insert', methods=['POST'])
+@jwt_required()
+def check_auth():
+    create_user = get_jwt_identity()
+    if not create_user:
+        return jsonify({"msg": "인증 헤더가 올바르지 않습니다!"}), 401
+    return redirect(url_for('show_index'))
     
 
 if __name__ == "__main__":
