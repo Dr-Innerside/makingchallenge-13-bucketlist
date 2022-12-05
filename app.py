@@ -12,21 +12,19 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import create_refresh_token
 
-
+# Setup default Flask Initial Status
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-
 load_dotenv()
 URL = os.environ.get('client')
 client = MongoClient(URL)
 db = client.makingchallenge
 
 # Setup the Flask-JWT-Extended extension
+jwt = JWTManager(app)
 app.config["JWT_SECRET_KEY"] = os.environ.get('SECRET_KEY')
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=2)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
-
-jwt = JWTManager(app)
 
 
 @app.route('/')
