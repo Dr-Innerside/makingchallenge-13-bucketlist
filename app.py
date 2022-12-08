@@ -12,6 +12,7 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import create_refresh_token
 
+
 # Setup default Flask Initial Status
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -29,7 +30,8 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
 @app.route('/')
 def show_index():
-    return render_template('index.html')
+    # return render_template('index.html')
+    return jsonify(a=test_123.a)
 
 
 @app.route('/bucket/signup', methods=['POST'])
@@ -88,7 +90,7 @@ def insert_bucket():
     return jsonify({"msg": "버킷이 등록되었습니다"}), 200
 
 
-@app.route('/bucket')
+@app.route('/bucket/read')
 @jwt_required()
 def read_bucket():
     read_user = get_jwt_identity()
@@ -99,7 +101,47 @@ def read_bucket():
         return jsonify({"msg": "회원님의 정보가 올바르지 않습니다"}), 401
     target_bucket_list = list(db.bucket.find({"username":read_user},{"_id": False}))
     return jsonify({"bucket_list": target_bucket_list})
+
+
+@app.route('/bucket/delete', methods=["POST"])
+@jwt_required()
+def delete_bucket():
+    delete_user = get_jwt_identity()
+    if not delete_user:
+        return jsonify({'msg':'유효한 인증 사용자가 아닙니다'}), 401
+    bucket_num_receive = int(request.form['bucket_num'])
+    db.bucket.delete_one({'bucket_num': bucket_num_receive})
+    return jsonify({'msg': '버킷 삭제에 성공했습니다'}), 200
     
+
+@app.route('/bucket/edit', methods=['POST'])
+@jwt_required()
+def edit_bucket():
+    edit_user = get_jwt_identity()
+    if not edit_user:
+        return jsonify({'msg': '유효한 인증 사용자가 아닙니다'}), 401
+    bucket_num_receive = int(request.form['bucket_num'])
+    bucket_edit_receive = request.form['bucket_edit']
+    db.bucket.update_one({'bucket_num': bucket_num_receive}, {"$set":{'bucket': bucket_edit_receive}})
+    return jsonify({'msg': '버킷 수정 완료!'}), 200
+
+@app.route('/bucket/like', methods=['POST'])
+@jwt_required()
+def like_bucket():
+    like_user = get_jwt_identity()
+    if not like_user:
+        return jsonify({'msg': '유효한 인증 사용자가 아닙니다'}), 401
+    bucket_num_receive = int(request.form['bucket_num'])
+    target_like = db.like.find_one({'like_user': like_user}, {'bucket_num': bucket_num_receive})
+    if target_like:
+        db.like.delete_one(target_like)
+        return jsonify({'msg': '좋아요 취소!'})
+    doc = {
+        'like_user' : like_user,
+        'bucket_num' : bucket_num_receive
+    }
+    db.like.insert_one(doc)
+    return jsonify({'msg': '좋아요 완료!'})
 
 if __name__ == "__main__":
     app.run('0.0.0.0',port=8080, debug=True)
