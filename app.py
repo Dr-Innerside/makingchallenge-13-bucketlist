@@ -30,8 +30,7 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
 @app.route('/')
 def show_index():
-    # return render_template('index.html')
-    return jsonify(a=test_123.a)
+    return render_template('index.html')
 
 
 @app.route('/bucket/signup', methods=['POST'])
@@ -125,6 +124,7 @@ def edit_bucket():
     db.bucket.update_one({'bucket_num': bucket_num_receive}, {"$set":{'bucket': bucket_edit_receive}})
     return jsonify({'msg': '버킷 수정 완료!'}), 200
 
+
 @app.route('/bucket/like', methods=['POST'])
 @jwt_required()
 def like_bucket():
@@ -142,6 +142,7 @@ def like_bucket():
     }
     db.like.insert_one(doc)
     return jsonify({'msg': '좋아요 완료!'})
+
 
 if __name__ == "__main__":
     app.run('0.0.0.0',port=8080, debug=True)
