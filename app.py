@@ -30,7 +30,7 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
 @app.route('/')
 def show_index():
-    return render_template('index.html')
+    return render_template('index2.html')
 
 
 @app.route('/bucket/signup', methods=['POST'])

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <title>2023 Bucket List</title>
+    <style>
+        body {
+            max-width: 380px;
+            background-color: #fcf8f7;
+        }
+        .flex-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+
+        }
+        .wrap-title {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 30px;
+        }
+        .profile > div {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-image: url("https://cdn.pixabay.com/photo/2012/08/27/14/19/mountains-55067__340.png");
+            background-position: center;
+            background-size: cover;
+        }
+        .profile > ul {
+            list-style: none;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .search-bar > button {
+            height: 25px;
+        }
+        .search-bar > input {
+            width: 250px;
+            height: 20px;
+        }
+        .bucketlist-box {
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .most-liked-bucket {
+            width: 100%;
+            background-color: tomato;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: white;
+            padding: 10px;
+            box-sizing: border-box;
+
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            accessLogin()
+            accessReadBucket()
+        })
+        const accessLogin = () => {
+            let formData = new FormData()
+            formData.append('username', '황영상')
+            formData.append('password', '123')
+            
+            fetch('/bucket/login',{
+                method: 'POST',
+                body: formData
+            }).then(res => res.json()).then(data => {
+                localStorage.setItem('access_token', data['access_token'])
+            })
+        }
+
+        const accessReadBucket = () => {
+            fetch('/bucket/read?username=황영상',{
+                headers : {
+                    Authorization : `Bearer ${localStorage.getItem('access_token')}`
+                }
+            }).then(res => res.json()).then(data => {
+                console.log(data)
+                data['bucket_list'].forEach((ele)=> {
+                    console.log(ele)
+                    let bucket = ele['bucket']
+                    let done = ele['done']
+                    let temp_html = `<div>
+                                        <input type="checkbox" value=${done}
+                                        <p>${bucket}</p>
+                                    </div>`
+                    $('#bucket-list').append(temp_html)
+
+                })
+            })
+        }
+    </script>
+</head>
+<body>
+    <div id="bucket-list"></div>
+
+    
+</body>
+</html>
