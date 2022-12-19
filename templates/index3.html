@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- CSS only -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <!-- JavaScript Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>2023년 버킷리스트</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #fcf8f7;
+      max-width: 400px;
+    }
+
+    .wrap {
+      margin: 32px 20px 0 20px;
+    }
+
+    .profile {
+      width: 90vw;
+      height: 60px;
+      margin: auto;
+
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .profile-content {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .profile-image {
+      background-color: aqua;
+      border-radius: 50%;
+
+      width: 56px;
+      height: 56px;
+      margin-right: 15px;
+
+      background-image: url("https://media.timeout.com/images/105211701/image.jpg");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .profile-text {
+      display: flex;
+      flex-direction: column;
+      align-items: baseline;
+      justify-content: center;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .profile-state {
+      font-size: 14px;
+    }
+
+    .profile-button {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+
+      background-image: url("../static/link.png");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .title {
+      margin: 20px 0;
+
+      color: #ff5b37;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .input-form {
+      padding: 16px 10px;
+      box-sizing: border-box;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* align-items: center; */
+      border-radius: 10px;
+
+      margin: 20px auto;
+    }
+
+    .form-text {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .form-text input {
+      padding: 12px 10px;
+      box-sizing: border-box;
+      width: 280px;
+      border: #9da7ae solid 1px;
+      border-radius: 4px;
+      margin: 8px auto;
+      outline: none;
+    }
+
+    [type="radio"] {
+      vertical-align: middle;
+    }
+
+    .form-text input::placeholder {
+      color: #b4bfc6;
+    }
+
+    .form-radio {
+      width: 280px;
+      margin: auto;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-radio input {
+      width: 20px;
+      height: 20px;
+      background-color: #ff5b37;
+      margin-right: 5px;
+    }
+
+    .form-radio label {
+      margin-right: 10px;
+    }
+
+    .form-button {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 10px;
+      box-sizing: border-box;
+      width: 280px;
+      background-color: #ff5b37;
+      border-radius: 4px;
+      margin: auto;
+      color: white;
+    }
+
+    .bucket-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .bucket-list input {
+      width: 20px;
+      height: 20px;
+    }
+
+    .bucket-list li {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      height: 57px;
+      font-size: 16px;
+    }
+
+    .bucket-list-element {
+      width: 280px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .list-text {
+      display: flex;
+      flex-direction: column;
+      align-items: baseline;
+      justify-content: baseline;
+    }
+
+    .list-text span {
+      font-size: 12px;
+      color: #9da7ae;
+    }
+
+    .like-on {
+      width: 20px;
+      height: 20px;
+      background-image: url("../static/likeOn.png");
+      background-position: center;
+      background-size: cover;
+    }
+
+    .like-count {
+      color: #ff5b37;
+    }
+
+    .like-off {
+      width: 20px;
+      height: 20px;
+      background-image: url("../static/likeOff.png");
+      background-position: center;
+      background-size: cover;
+    }
+
+    .list-done {
+      color: #9da7ae;
+      text-decoration: line-through;
+    }
+
+    .friend-form-text {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 10px;
+      box-sizing: border-box;
+      width: 280px;
+
+      background-color: white;
+      border: 1px solid #9da7ae;
+      border-radius: 4px;
+      margin: 8px auto;
+      color: white;
+    }
+
+    .friend-input1,
+    .friend-input2 {
+      border: none;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .friend-input1::placeholder,
+    .friend-input2::placeholder {
+      color: #9da7ae;
+    }
+
+    .friend-input1 {
+      width: 40px;
+    }
+
+    .friend-input2 {
+      width: 250px;
+    }
+
+    .friend-form-text span {
+      color: #9da7ae;
+    }
+
+    .profile-button {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 120px;
+    }
+
+    .profile-button button {
+      width: 50px;
+      height: 50px;
+      border: none;
+      background-color: tomato;
+      border-radius: 8px;
+      color: white;
+      margin-right: 10px;
+    }
+
+    .bg, .bg:hover, .bg:focus, .bg-active {
+      background-color: tomato;
+      border: none;
+    }
+    
+    .btn-warning {
+
+    }
+  </style>
+  <script>
+    const accessLogin  = () => {
+      $('#modal1').css('display', 'block')
+      
+    }
+
+    const closeModal = (modalNum) => {
+      let modalSelector = `modal${modalNum}`
+      $(`#${modalSelector}`).css('display', 'none')
+    }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="title">2023년 버킷리스트</div>
+    <div class="profile">
+      <div class="profile-content">
+        <div class="profile-image"></div>
+        <div class="profile-text">
+          <div class="profile-name">황영상</div>
+          <div class="profile-state">올해 반드시 코딩 뿌셔!</div>
+        </div>
+      </div>
+      <div class="profile-button">
+        <button onclick="accessLogin()">login</button>
+        <button>검색</button>
+      </div>
+    </div>
+    <div class="input-form">
+      <div class="form-radio">
+        <input id="radio3" name="input-friend-radio" type="radio" value="me" /><label for="radio3">
+          <div></div>
+          <span>나 이거 해야 돼</span>
+        </label>
+        <input id="radio4" name="input-friend-radio" type="radio" value="friend" /><label for="radio4">
+          <div></div>
+          <span>너 이거 해야 돼</span>
+        </label>
+      </div>
+      <div class="form-text">
+        <input type="text" placeholder="2023년에 해야되는 일" />
+      </div>
+      <div class="form-button">추가하기</div>
+    </div>
+    <div class="bucket-list">
+      <li>
+        <div class="bucket-list-element">
+          <input id="checkbox" type="checkbox" value="1" checked /><label for="checkbox"></label>
+          <div>🏆</div>
+          <div class="list-text friend-list">
+            <span>김르탄</span>
+            <a class="list-done">매주 개발일지 쓰기</a>
+          </div>
+        </div>
+        <div class="like-on"></div>
+      </li>
+      <li>
+        <div class="bucket-list-element">
+          <input id="checkbox2" type="checkbox" value="2" /><label for="checkbox2"></label>
+          <div class="list-text">
+            <a>운동일지 100개 기록하기</a>
+          </div>
+        </div>
+        <div class="like-off"></div>
+      </li>
+      <li>
+        <div class="bucket-list-element">
+          <input id="checkbox3" type="checkbox" value="3" /><label for="checkbox3"></label>
+          <div class="list-text friend-list">
+            <span>황스파</span>
+            <a>같이 동유럽 일주하기</a>
+          </div>
+        </div>
+        <div class="like-on"></div>
+        <span class="like-count">2</span>
+      </li>
+      <li>
+        <div class="bucket-list-element">
+          <input id="checkbox4" type="checkbox" checked value="4" /><label for="checkbox4"></label>
+          <div>🏆</div>
+          <div class="list-text">
+            <a class="list-done">블로그 포스팅 100개 하기!</a>
+          </div>
+        </div>
+        <div class="like-off"></div>
+      </li>
+    </div>
+    <div class="input-form">
+      <div class="form-radio">
+        <input id="radio" name="input-radio" type="radio" value="me" /><label for="radio">
+          <div></div>
+          <span>나 이거 해야 돼</span>
+        </label>
+        <input id="radio2" name="input-radio" type="radio" value="friend" checked /><label for="radio2">
+          <div></div>
+          <span>너 이거 해야 돼</span>
+        </label>
+      </div>
+      <div class="friend-form-text">
+        <input class="friend-input1" type="text" placeholder="내 이름">
+        <span> ㅣ </span>
+        <input class="friend-input2" type="text" placeholder="2023년에 꼭 해야 하는 일">
+      </div>
+      <div class="form-button">추가하기</div>
+    </div>
+  </div>
+  <div id="modal1" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">로그인</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal(1)"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">아이디</label>
+            <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="아이디를 입력해주세요">
+          </div>
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">비밀번호</label>
+            <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="비밀번호를 입력해주세요">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="showSignup">회원가입</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          <button type="button" class="btn btn-primary bg">로그인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -125,6 +125,20 @@ def edit_bucket():
     return jsonify({'msg': '버킷 수정 완료!'}), 200
 
 
+@app.route('/bucket/check')
+@jwt_required()
+def check_bucket():
+    check_user = get_jwt_identity()
+    if not check_user:
+        return jsonify({'msg': '유효한 인증 사용자가 아닙니다'})
+    bucket_num_receive = int(request.args.get('bucketNum'))
+    bucket_done_receive = int(request.args.get('bucketDone'))
+    change_done = 1 if bucket_done_receive == 0 else 0
+    db.bucket.update_one({'bucket_num': bucket_num_receive},{'$set':{'done':change_done}})
+    return jsonify({'msg': '버킷 체크 완료!'}), 200
+
+
+
 @app.route('/bucket/like', methods=['POST'])
 @jwt_required()
 def like_bucket():
