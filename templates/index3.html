@@ -105,7 +105,7 @@
       align-items: center;
     }
 
-    .form-text input {
+    .my-input1 {
       padding: 12px 10px;
       box-sizing: border-box;
       width: 280px;
@@ -113,6 +113,7 @@
       border-radius: 4px;
       margin: 8px auto;
       outline: none;
+      display: none;
     }
 
     [type="radio"] {
@@ -284,24 +285,179 @@
       margin-right: 10px;
     }
 
-    .bg, .bg:hover, .bg:focus, .bg-active {
+    .bg,
+    .bg:hover,
+    .bg:focus,
+    .bg-active {
       background-color: tomato;
       border: none;
     }
-    
-    .btn-warning {
 
+    #logout-btn {
+      display: none;
     }
   </style>
   <script>
-    const accessLogin  = () => {
+    $(document).ready(function () {
+      checkLogin()
+      readBucket()
+    })
+
+    const showLogin = () => {
       $('#modal1').css('display', 'block')
-      
+
     }
 
     const closeModal = (modalNum) => {
       let modalSelector = `modal${modalNum}`
       $(`#${modalSelector}`).css('display', 'none')
+    }
+
+    const accessLogin = () => {
+      let loginId = $('#login-id').val()
+      let loginPwd = $('#login-password').val()
+      // console.log(loginId, loginPwd)
+
+      let formData = new FormData()
+      formData.append('username', loginId)
+      formData.append('password', loginPwd)
+
+      fetch('/bucket/login', {
+        method: 'POST',
+        body: formData
+      }).then(res => res.json()).then(data => {
+        // console.log(data)
+        let accessToken = data['access_token']
+        let refreshToken = data['refresh_token']
+        localStorage.setItem('access_token', accessToken)
+        localStorage.setItem('refresh_token', refreshToken)
+
+        alert(data['msg'])
+        window.location.reload()
+      })
+    }
+
+    const checkLogin = () => {
+      let isLogin = localStorage.getItem('access_token')
+      if (isLogin) {
+        $('#login-btn').css('display', 'none')
+        $('#logout-btn').css('display', 'block')
+      }
+    }
+
+    const readBucket = () => {
+      let username = $('#username').text()
+      console.log(username)
+      $('#bucket-list').empty()
+      fetch(`/bucket/read?username=${username}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        }
+      }).then(res => res.json()).then(data => {
+        console.log(data)
+        data['bucket_list'].forEach((bucket) => {
+          let content = bucket['bucket']
+          let num = bucket['bucket_num']
+          let done = bucket['done']
+          let username = bucket['username']
+          let like = bucket['bucket_like']
+          let temp_html = ``
+          
+
+          done == 0
+            ? temp_html = `<li>
+                            <div class="bucket-list-element">
+                              <input id="bucket${num}" type="checkbox" onclick="checkBucket(${num}, ${done})"/><label for="bucket${num}"></label>
+                              <div class="list-text friend-list">
+                                <span>${username}</span>
+                                <a>${content}</a>
+                              </div>
+                            </div>
+                            <div class="like-on"></div>
+                            <span class="like-count" onclick="likeBucket(${num})">👍${like}</span>
+                          </li>`
+            : temp_html = `<li>
+                            <div class="bucket-list-element">
+                              <input id="bucket${num}" type="checkbox" checked  onclick="checkBucket(${num}, ${done})"/><label for="bucket${num}"></label>
+                              <div>🏆</div>
+                              <div class="list-text friend-list">
+                                <span>${username}</span>
+                                <a class="list-done">${content}</a>
+                              </div>
+                            </div>
+                            <div class="like-on" onclick="likeBucket(${num})">👍</div>
+                          </li>`
+          $('#bucket-list').append(temp_html)
+        })
+
+      })
+    }
+
+    const showInput = (isMe) => {
+      if (isMe == 'me') {
+        $('.my-input1').css('display','block')
+        $('.friend-form-text').css('display','none')
+      } else {
+        $('.my-input1').css('display','none')
+        $('.friend-form-text').css('display','block')
+        $('.friend-form-text').css('display','flex')
+        $('.friend-form-text').css('flex-direction','row')
+      }
+    }
+
+    const insertBucket = () => {
+      let content = $('.my-input1').val()
+      // console.log(content)
+      let formData = new FormData()
+      formData.append('bucket', content)
+
+      fetch('/bucket/insert',{
+        method : 'POST',
+        headers : {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: formData
+      }).then(res => res.json()).then(data => {
+        // console.log(data)
+        alert(data['msg'])
+        window.location.reload()
+      })
+    }
+
+    const accessLogout = () => {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      alert('로그아웃 되었습니다!')
+      window.location.reload()
+    }
+
+    const checkBucket = (bucketNum, bucketDone) => {
+      fetch(`/bucket/check?bucketNum=${bucketNum}&bucketDone=${bucketDone}`,{
+        headers : {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        }
+      }).then(res => res.json()).then(data => {
+        // console.log(data)
+        alert(data['msg'])
+        window.location.reload()
+      })
+    }
+
+    const likeBucket = (bucketNum) => {
+      let formData = new FormData()
+      formData.append('bucket_num', bucketNum)
+
+      fetch('/bucket/like',{
+        method : 'POST',
+        body : formData,
+        headers : {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`
+        }
+      }).then(res => res.json()).then(data => {
+        // console.log(data)
+        alert(data['msg'])
+        window.location.reload()
+      })
     }
   </script>
 </head>
@@ -313,32 +469,36 @@
       <div class="profile-content">
         <div class="profile-image"></div>
         <div class="profile-text">
-          <div class="profile-name">황영상</div>
+          <div id="username" class="profile-name">황영상</div>
           <div class="profile-state">올해 반드시 코딩 뿌셔!</div>
         </div>
       </div>
       <div class="profile-button">
-        <button onclick="accessLogin()">login</button>
+        <button id="login-btn" onclick="showLogin()">login</button>
+        <button id="logout-btn" onclick="accessLogout()">logout</button>
         <button>검색</button>
       </div>
     </div>
     <div class="input-form">
       <div class="form-radio">
-        <input id="radio3" name="input-friend-radio" type="radio" value="me" /><label for="radio3">
+        <input id="radio" name="input-radio" type="radio" value="me" onclick="showInput(this.value)"/><label for="radio">
           <div></div>
           <span>나 이거 해야 돼</span>
         </label>
-        <input id="radio4" name="input-friend-radio" type="radio" value="friend" /><label for="radio4">
+        <input id="radio2" name="input-radio" type="radio" value="friend" onclick="showInput(this.value)"/><label for="radio2">
           <div></div>
           <span>너 이거 해야 돼</span>
         </label>
       </div>
-      <div class="form-text">
-        <input type="text" placeholder="2023년에 해야되는 일" />
+      <div class="friend-form-text">
+        <input class="friend-input1" type="text" placeholder="내 이름">
+        <span> ㅣ </span>
+        <input class="friend-input2" type="text" placeholder="2023년에 꼭 해야 하는 일">
       </div>
-      <div class="form-button">추가하기</div>
+      <input class="my-input1" type="text" placeholder="2023년에 해야되는 일" />
+      <div class="form-button" onclick="insertBucket()">추가하기</div>
     </div>
-    <div class="bucket-list">
+    <div id="bucket-list" class="bucket-list">
       <li>
         <div class="bucket-list-element">
           <input id="checkbox" type="checkbox" value="1" checked /><label for="checkbox"></label>
@@ -381,46 +541,29 @@
         <div class="like-off"></div>
       </li>
     </div>
-    <div class="input-form">
-      <div class="form-radio">
-        <input id="radio" name="input-radio" type="radio" value="me" /><label for="radio">
-          <div></div>
-          <span>나 이거 해야 돼</span>
-        </label>
-        <input id="radio2" name="input-radio" type="radio" value="friend" checked /><label for="radio2">
-          <div></div>
-          <span>너 이거 해야 돼</span>
-        </label>
-      </div>
-      <div class="friend-form-text">
-        <input class="friend-input1" type="text" placeholder="내 이름">
-        <span> ㅣ </span>
-        <input class="friend-input2" type="text" placeholder="2023년에 꼭 해야 하는 일">
-      </div>
-      <div class="form-button">추가하기</div>
-    </div>
   </div>
   <div id="modal1" class="modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">로그인</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal(1)"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+            onclick="closeModal(1)"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">아이디</label>
-            <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="아이디를 입력해주세요">
+            <input type="email" class="form-control" id="login-id" placeholder="아이디를 입력해주세요">
           </div>
           <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">비밀번호</label>
-            <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="비밀번호를 입력해주세요">
+            <input type="password" class="form-control" id="login-password" placeholder="비밀번호를 입력해주세요">
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-warning" data-bs-dismiss="modal" onclick="showSignup">회원가입</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-          <button type="button" class="btn btn-primary bg">로그인</button>
+          <button type="button" class="btn btn-primary bg" onclick="accessLogin()">로그인</button>
         </div>
       </div>
     </div>

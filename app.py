@@ -17,7 +17,8 @@ from flask_jwt_extended import create_refresh_token
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 load_dotenv()
-URL = os.environ.get('client')
+# URL = os.environ.get('client')
+URL = 'mongodb+srv://sparta:sparta@cluster0.ryaqzeb.mongodb.net/?retryWrites=true&w=majority'
 client = MongoClient(URL)
 db = client.makingchallenge
 
@@ -30,7 +31,7 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
 @app.route('/')
 def show_index():
-    return render_template('index2.html')
+    return render_template('index3.html')
 
 
 @app.route('/bucket/signup', methods=['POST'])
@@ -149,12 +150,16 @@ def like_bucket():
     target_like = db.like.find_one({'like_user': like_user}, {'bucket_num': bucket_num_receive})
     if target_like:
         db.like.delete_one(target_like)
+        target_bucket_like = len(list(db.like.find({'bucket_num':bucket_num_receive})))
+        db.bucket.update_one({'bucket_num':bucket_num_receive},{'$set':{'bucket_like':target_bucket_like}})
         return jsonify({'msg': '좋아요 취소!'})
     doc = {
         'like_user' : like_user,
         'bucket_num' : bucket_num_receive
     }
     db.like.insert_one(doc)
+    target_bucket_like = len(list(db.like.find({'bucket_num':bucket_num_receive})))
+    db.bucket.update_one({'bucket_num':bucket_num_receive},{'$set':{'bucket_like':target_bucket_like}})
     return jsonify({'msg': '좋아요 완료!'})
 
 
